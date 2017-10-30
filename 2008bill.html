@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>2008统计价格计算器</title>
+	<link rel="stylesheet" type="text/css" href="js/themes/default/easyui.css">   
+	<link rel="stylesheet" type="text/css" href="js/themes/icon.css">   
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+	<style type="text/css">
+		li{
+			list-style-type:none;
+		}
+	</style>
+	<script type="text/javascript">
+		// //原始js拓展extends
+		// Array.prototype.indexOf = function(val) {
+		// 	for (var i = 0; i < this.length; i++) {
+		// 		if (this[i] == val) return i;
+		// 	}
+		// 	return -1;
+		// };
+		// Array.prototype.remove = function(val) {
+		// 	var index = this.indexOf(val);
+		// 		if (index > -1) {
+		// 	this.splice(index, 1);
+		// 	}
+		// };
+	</script>
+	<script type="text/javascript">
+		//定义对象
+		//人员
+		var Person = function(name){
+			this.name=name;
+			this.totalPrice=0;
+			this.paidPrice=0;
+			this.unpaidPrice=0;
+			this.payments= [];
+			this.needPayments = [];
+		}
+		//需要支付的人
+		var NeedPayPerson = function(name,weight){
+			this.name = name;
+			if(weight)
+				this.weight=weight;
+			else this.weight = 0;
+			this.needPayPrice = 0;
+		}
+		//需要支付的项目
+		var Payment = function(title,price,needPayPersons){
+			this.title=title;
+			this.needPayPersons=needPayPersons;
+			this.needPayPrice=0;
+			this.price=price;
+			this.totalWeight=0;
+		}
+
+		var TotalPayment = function(){
+			this.payments = [];
+			this.totalPrice = 0;
+		}
+	</script>
+	<script type="text/javascript">
+		//处理账单函数
+		Person.prototype.addPayment = function(payment){
+			this.payments.push(payment);
+		}
+		
+		//获取所有的账单
+		TotalPayment.prototype.addPayment = function(payment){
+			this.payments.push(payment);
+			this.totalPrice += payment.price;
+		}
+
+		//给某个人添加账单
+		function addPaymentToPerson(persons,name,payment){
+			for(var i = 0;i<persons.length;i++){
+				var person = persons[i];
+				if(person.name == name){
+					person.addPayment(payment);
+					person.paidPrice += payment.price;
+				}
+			}
+			//计算总权重
+			for(var i = 0;i<payment.needPayPersons.length;i++){
+				payment.totalWeight += payment.needPayPersons[i].weight;
+			}
+		}
+
+		//根据账单计算每个人需要支付的钱
+		function calcPayment(persons,payment){
+			var totalWeight = payment.totalWeight;
+			// console.log(payment);
+			for(var i=0;i<payment.needPayPersons.length;i++){
+				var needPayPerson = payment.needPayPersons[i];
+				for(var j=0;j<persons.length;j++){
+					var person = persons[j];
+					// console.log(person);
+					if(needPayPerson.name ==person.name){
+						person.totalPrice += needPayPerson.weight/totalWeight*payment.price;
+						var needPayments = person.needPayments;
+						// console.log(needPayments);
+						var flag = true;
+						for(var k=0;k<needPayments.length;k++){
+							if(payment.title==needPayments[k].title){
+								needPayments[k].needPayPrice+=needPayPerson.weight/totalWeight*payment.price;
+								flag = false;
+								break;
+							}
+						}
+						if(flag){
+							var pay = jQuery.extend(true, {}, payment);
+							pay.needPayPrice += needPayPerson.weight/totalWeight*payment.price;
+							person.needPayments.push(pay);
+						}
+						break;
+					}
+				}
+			}
+		}
+
+	</script>
+	<script type="text/javascript">
+		//具体步骤
+		//1、初始化数据
+		var persons = [];
+		var weightTemplates = [];
+		var personNames = ["张秋","刘师源","董清国","陆俊彪","高宇豪","刘璨","郭彦秋"];
+		
+		// var needPayPersons = [];
+		// var needPayPersons2 = [];
+		// for(var i = 0;i<personNames.length;i++){
+		// 	persons.push(new Person(personNames[i]));
+		// 	needPayPersons.push(new NeedPayPerson(personNames[i],1));
+		// 	if(personNames[i]!="郭彦秋"){
+		// 		needPayPersons2.push(new NeedPayPerson(personNames[i],1));
+		// 	}
+		// }
+		// // console.log(persons);
+		
+
+		// var pay1 = new Payment("水费",200,needPayPersons);
+		// var pay2 = new Payment("电费",300,needPayPersons);
+		// var pay3 = new Payment("电费",350,needPayPersons2);
+		// addPaymentToPerson(persons,"张秋",pay1);
+		// addPaymentToPerson(persons,"董清国",pay2);
+		// addPaymentToPerson(persons,"高宇豪",pay3);
+
+		// console.log(persons);
+		// //2、获取总账单 //计算每个人已经支付的
+		// var totalPayment = new TotalPayment();
+		// for(var i = 0;i<persons.length;i++){
+		// 	var person = persons[i];
+		// 	for(var j = 0;j<person.payments.length;j++){
+		// 		totalPayment.addPayment(person.payments[j]);
+		// 	}
+		// }
+		// console.log(totalPayment);
+		
+		// //3、根据账单，计算每个人需要的支付的钱
+		// for(var i=0;i<totalPayment.payments.length;i++){
+		// 	var payment = totalPayment.payments[i];
+		// 	calcPayment(persons,payment);
+		// }
+		// console.log(persons);
+
+		// //4、计算尚未支付的钱
+		// for(var i=0;i<persons.length;i++){
+		// 	var person = persons[i];
+		// 	person.unpaidPrice = person.totalPrice - person.paidPrice;
+		// }
+		
+	</script>
+	
+</head>
+<body>
+	<h3>填写需要支付的钱</h3>
+	<span class="weightTemplate" style="display: none">
+		<span class="weightName"></span>
+		<input class="weightValue num" style="width: 40px;" name="weightValue" value="1"/>
+	</span>
+	<span  class="weightTemplates"></span>
+	<div>
+		<div  class="itemParamAddTemplate" style="display: none;">
+			<li class="param">
+				<ul>
+					<li>
+						<span class="personName"></span>&nbsp;<a href="javascript:void(0)" class="easyui-linkbutton addParam"  title="添加参数" data-options="plain:true,iconCls:'icon-add'"></a>
+					</li>
+					<li class="paymentLi">
+						<span>|-------</span>
+						项目：<input  style="width: 50px;" class="title" name="title" />
+						价格：<input  style="width: 100px;" class="num" name="price" />
+						均分?：<input type="checkbox" class="isAverage" name="isAverage" checked="checked"/>
+						<div style="display: inline-block;" class="weight"></div>
+						<a href="javascript:void(0)" class="easyui-linkbutton delParam" title="删除" data-options="plain:true,iconCls:'icon-cancel'"></a>						
+					</li>
+				</ul>
+			</li>
+		</div>
+	</div>
+	<div id="init_data"></div>
+	
+	<div>
+		<a id="calc" class="easyui-linkbutton" data-options="iconCls:'icon-search'">计算</a>  
+	</div>
+
+	<h3>汇总的价钱</h3>
+	<table id="result_dg"></table>
+
+</body>
+<script type="text/javascript">
+	function formatPrice(val,row){
+		return val.toFixed(2);
+	}
+	function formatDetail(val,row,index){
+		var person = row;
+		var detail = "";
+		for(var i=0;i<person.needPayments.length;i++){
+			if(i!=0) detail +=",";
+			detail += " "+person.needPayments[i].title;
+			detail += " :"+person.needPayments[i].needPayPrice.toFixed(2);
+		}
+		return "<span title='" + detail + "'>" + detail + "</span>";;
+	}
+	function initWeightTemplates(){
+		var weightTemplate = $(".weightTemplate").eq(0).clone();
+		for(var i=0;i<personNames.length;i++){
+			var temp = weightTemplate.clone();
+			temp.find(".weightName").text(personNames[i]);
+			$(".weightTemplates").eq(0).append(temp);
+		}
+
+	}
+
+	//初始化
+	function initPerson(name){
+		var temple = $(".itemParamAddTemplate li").eq(0).clone();
+		$("#init_data").append(temple);
+		temple.find(".personName").text(name);
+		temple.find(".addParam").click(function(){
+		  var li = $(".itemParamAddTemplate li").eq(2).clone();
+		  li.find(".delParam").click(function(){
+			  $(this).parent().remove();
+		  });
+		  li.find(".title").textbox();
+		  li.find(".isAverage").click(addWeightTemplates(li));
+		  li.appendTo($(this).parentsUntil("ul").parent());
+		  $(this).parentsUntil("ul").parent().find('.num').numberbox({    
+		      min:0,    
+		      precision:2    
+		  });  
+		});
+		temple.find(".delParam").click(function(){
+		  $(this).parent().remove();
+		});
+		temple.find(".title").textbox().textbox("setValue","杂项");
+		temple.find(".isAverage").click(addWeightTemplates(temple));
+		temple.find('.num').numberbox({    
+		    min:0,    
+		    precision:2    
+		});
+	}
+
+	function initPersons(){
+		for(var i=0;i<personNames.length;i++){
+			initPerson(personNames[i]);
+		}
+	}
+
+	$(function () {
+	 	initPersons();
+	 	initWeightTemplates();
+	 	//绑定
+	 	$(".price").bind('blur',function(event) {
+	 		alert("必须为数字");
+	 	});
+	});
+	
+	function addWeightTemplates(temple){
+		temple.find(".isAverage").click(function() {
+			var flag = $(this).prop("checked");
+			$(this).parent().find(".weight").empty();
+			var weightTemplates = $(".weightTemplates").eq(0).clone();
+			if(!flag){
+				$(this).parent().find(".weight").append(weightTemplates.find(".weightTemplate").show());
+			}
+			$(this).parent().find(".num").numberbox({    
+		      min:0,    
+		      precision:1   
+		  });  
+		});
+	}
+
+	//计算数据
+	$("#calc").click(function() {
+		//清空数据
+		persons=[];
+		//初始化人
+		$(".param").each(function(index,element){
+			var name = $(element).find(".personName").text();
+			if(name)
+				persons.push(new Person(name));
+		});
+		//初始化账单
+		$(".param").each(function(index,element){
+			var name = $(element).find(".personName").text();
+			if(!name)
+				return true;
+			var paymentLis = $(element).find(".paymentLi");
+			$(paymentLis).each(function(i,ele){
+				// console.log(ele);
+				var title = $(ele).find("[name='title']").siblings("input").val();
+				var price = eval($(ele).find("[name='price']").siblings("input").val());
+				var needPayPersons = [];
+				var needPay = $(ele).find(".weightTemplate");
+				if(needPay.length){
+					// console.log(needPay);
+					$(needPay).each(function(_i,_ele) {
+						var weightName = $(_ele).find(".weightName").text();
+						var weightValue = eval($(_ele).find("[name='weightValue']").siblings('input').val());
+						console.log(weightValue);
+						if(!weightName)
+							return true;
+						needPayPersons.push(new NeedPayPerson(weightName,weightValue));
+					})
+				}else{
+					$(".param").each(function(index,element){
+						var weightName = $(element).find(".personName").text();
+						if(!weightName)
+							return true;
+						needPayPersons.push(new NeedPayPerson(weightName,1));
+					});
+				}
+				if(!price)
+					return true;
+				// console.log(needPayPersons);
+				var payment = new Payment(title,price,needPayPersons);
+				console.log(payment);
+				addPaymentToPerson(persons,name,payment);
+			})
+		});
+
+		//汇总账单
+		totalPayment = new TotalPayment();
+		for(var i = 0;i<persons.length;i++){
+			var person = persons[i];
+			for(var j = 0;j<person.payments.length;j++){
+				totalPayment.addPayment(person.payments[j]);
+			}
+		}
+		console.log(totalPayment);
+
+		//3、根据账单，计算每个人需要的支付的钱
+		for(var i=0;i<totalPayment.payments.length;i++){
+			var payment = totalPayment.payments[i];
+			calcPayment(persons,payment);
+		}
+		console.log(persons);
+
+		//4、计算尚未支付的钱
+		for(var i=0;i<persons.length;i++){
+			var person = persons[i];
+			person.unpaidPrice = person.totalPrice - person.paidPrice;
+		}
+		console.log(persons);
+
+		//easyui界面
+		$('#result_dg').datagrid({    
+		    data:persons,    
+		    columns:[[    
+		        {field:'name',title:'姓名',width:100},    
+		        {field:'totalPrice',title:'需支付',width:100,align:'right',formatter: formatPrice}, 
+		        {field:'paidPrice',title:'已支付',width:100,align:'right',formatter: formatPrice},
+		        {field:'unpaidPrice',title:'未支付',width:100,align:'right',formatter: formatPrice},
+		        {field:'detail',title:'详情',formatter: formatDetail},
+		    ]]    
+		}); 
+		
+	});
+
+	
+
+</script>
+
+</html>
