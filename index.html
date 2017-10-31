@@ -11,6 +11,10 @@
 	    li {
 	        list-style-type: none;
 	    }
+	    .init_name,.init_title {
+	    	margin-left: 10px;
+	    }
+
     </style>
     <script type="text/javascript">
 	    // //原始js拓展extends
@@ -131,62 +135,40 @@
 	    var personNames = ["张秋", "刘师源", "董清国", "陆俊彪", "高宇豪", "刘璨", "郭彦秋"];
 	    var payTitles = ["饭费","电费","水费","房费","燃气费"];
 	    var titleJson = [];
-	    for(var i in payTitles){
-	    	console.log(i);
-	    	var temp = {text:payTitles[i],title:payTitles[i]}
-	    	titleJson.push(temp);
-	    }
-
-	    // var needPayPersons = [];
-	    // var needPayPersons2 = [];
-	    // for(var i = 0;i<personNames.length;i++){
-	    // 	persons.push(new Person(personNames[i]));
-	    // 	needPayPersons.push(new NeedPayPerson(personNames[i],1));
-	    // 	if(personNames[i]!="郭彦秋"){
-	    // 		needPayPersons2.push(new NeedPayPerson(personNames[i],1));
-	    // 	}
-	    // }
-	    // // console.log(persons);
-
-
-	    // var pay1 = new Payment("水费",200,needPayPersons);
-	    // var pay2 = new Payment("电费",300,needPayPersons);
-	    // var pay3 = new Payment("电费",350,needPayPersons2);
-	    // addPaymentToPerson(persons,"张秋",pay1);
-	    // addPaymentToPerson(persons,"董清国",pay2);
-	    // addPaymentToPerson(persons,"高宇豪",pay3);
-
-	    // console.log(persons);
-	    // //2、获取总账单 //计算每个人已经支付的
-	    // var totalPayment = new TotalPayment();
-	    // for(var i = 0;i<persons.length;i++){
-	    // 	var person = persons[i];
-	    // 	for(var j = 0;j<person.payments.length;j++){
-	    // 		totalPayment.addPayment(person.payments[j]);
-	    // 	}
-	    // }
-	    // console.log(totalPayment);
-
-	    // //3、根据账单，计算每个人需要的支付的钱
-	    // for(var i=0;i<totalPayment.payments.length;i++){
-	    // 	var payment = totalPayment.payments[i];
-	    // 	calcPayment(persons,payment);
-	    // }
-	    // console.log(persons);
-
-	    // //4、计算尚未支付的钱
-	    // for(var i=0;i<persons.length;i++){
-	    // 	var person = persons[i];
-	    // 	person.unpaidPrice = person.totalPrice - person.paidPrice;
-	    // }
     </script>
 </head>
 
 <body>
+    <h1>2008费用计算器</h1>
+
+    <h3>填写人员和数据</h3>
+    <span class="nameTemplate" style="display: none;">
+		<a class="easyui-linkbutton init_name delSel" data-options="iconCls:'icon-clear',iconAlign:'right'"></a>
+    </span>
+    <span class="titleTemplate" style="display: none;">
+		<a class="easyui-linkbutton init_title delSel" data-options="iconCls:'icon-clear',iconAlign:'right'"></a>
+    </span>
+    <div>
+		<h4 style="display: inline-block;width: 50px;margin-left: 50px;">人员:</h4>
+		<span id="names">
+			
+		</span>
+		<a id="btnName" class="easyui-linkbutton" data-options="iconCls:'icon-add'" style="margin-left: 10px">添加</a>  
+		 
+    </div>
+    <div>
+		<h4 style="display: inline-block;width: 50px;margin-left: 50px;">项目:</h4>
+		<span id="titles">
+			
+		</span>
+		<a id="btnTitle" class="easyui-linkbutton" data-options="iconCls:'icon-add'" style="margin-left: 10px">添加</a>  
+    </div>
+	<a id="confirmItem" class="easyui-linkbutton" data-options="iconCls:'icon-lock'" style="margin-left: 10px">确认</a> 
+	<a id="reloadButton" class="easyui-linkbutton" data-options="iconCls:'icon-reload'" style="margin-left: 10px">重置</a> 
     <h3>填写费用</h3>
-    <span class="weightTemplate" style="display: none">
+    <span class="weightTemplate" style="display: none;font-size: 10px">
 		<span class="weightName"></span>
-    <input class="weightValue num" style="width: 40px;" name="weightValue" value="1" />
+    	<input class="weightValue num" style="width: 40px;font-size: 8px" name="weightValue" value="1" />
     </span>
     <span class="weightTemplates"></span>
     <div>
@@ -200,7 +182,7 @@
                     <li class="paymentLi">
                         <span>|-------</span> 
                         项目：<!-- <input style="width: 50px;" class="title" name="title" /> -->
-                        <input style="width: 70px;" class="title_cc" name="title" value="杂费">  
+                        <input style="width: 70px;" class="title_cc" name="title">  
                         价格：<input style="width: 100px;" class="num" name="price" /> 
                         均分?：<input type="checkbox" class="isAverage" name="isAverage" checked="checked" />
                         <div style="display: inline-block;" class="weight"></div>
@@ -212,9 +194,9 @@
     </div>
     <div id="init_data"></div>
     <div>
-        <a id="calc" class="easyui-linkbutton" data-options="iconCls:'icon-search'">计算</a>
+        <a id="calc" class="easyui-linkbutton" data-options="iconCls:'icon-search'" style="display: none;margin-left: 10px">计算</a>
     </div>
-    <h3>汇总的价钱</h3>
+    <h3>汇总的费用</h3>
     <table id="result_dg"></table>
     <h3>总计&nbsp;&nbsp;<span id="total"></span>元</h3>
     
@@ -223,11 +205,21 @@
 <script type="text/javascript">
 	//预加载函数
 	$(function() {
-	    initPersons();
-	    initWeightTemplates();
+		// initNames();
+		initNameAndTitle();
+	    // initPersons();
+	    // initWeightTemplates();
 	});
 
+
+	//初始化姓名和标题
+	function initNameAndTitle(){
+		initParams(personNames,"names","nameTemplate");
+		initParams(payTitles,"titles","titleTemplate");
+	}
+
 	function initWeightTemplates() {
+		$(".weightTemplates").eq(0).empty();
 	    var weightTemplate = $(".weightTemplate").eq(0).clone();
 	    for (var i = 0; i < personNames.length; i++) {
 	        var temp = weightTemplate.clone();
@@ -241,13 +233,14 @@
 	function initPerson(name) {
 	    var temple = $(".itemParamAddTemplate li").eq(0).clone();
 	    $("#init_data").append(temple);
+	    //添加人员名
 	    temple.find(".personName").text(name);
+	    //点击事件添加
 	    temple.find(".addParam").click(function() {
 	        var li = $(".itemParamAddTemplate li").eq(2).clone();
 	        li.find(".delParam").click(function() {
 	            $(this).parent().remove();
 	        });
-	        // li.find(".title").textbox();
 	        li.find(".isAverage").click(addWeightTemplates(li));
 	        li.appendTo($(this).parentsUntil("ul").parent());
 	        $(this).parentsUntil("ul").parent().find('.num').numberbox({
@@ -264,21 +257,13 @@
 	    temple.find(".delParam").click(function() {
 	        $(this).parent().remove();
 	    });
-	    // temple.find(".title").textbox().textbox("setValue", "杂项");
-	    temple.find(".isAverage").click(addWeightTemplates(temple));
-	    temple.find('.num').numberbox({
-	        min: 0,
-	        precision: 2
-	    });
-	    temple.find('.title_cc').combobox({    
-	        data: titleJson,
-	        valueField:'text',    
-	        textField:'title',
-	        panelHeight:'auto'   
-	    });
+	    // console.log($(temple));
+	    $(temple).find(".paymentLi").remove(); //先清空，然后模拟点击事件添加
+	    temple.find(".addParam").click();
 	}
 
 	function initPersons() {
+		$("#init_data").empty();
 	    for (var i = 0; i < personNames.length; i++) {
 	        initPerson(personNames[i]);
 	    }
@@ -297,6 +282,129 @@
 	            precision: 1
 	        });
 	    });
+	}
+
+	//初始化名称和项目--------------------------------------------------------------------
+	function initParams(array,id,template){
+		for(var i in array){
+			var tempA = $("."+template).eq(0).find("a").eq(0).clone();
+			tempA.html(array[i]);
+			tempA.linkbutton();
+			$("#"+id).append(tempA);
+			$(".delSel").click(function(){
+				$(this).remove();
+			});
+		}
+	}
+	
+	//添加自删除函数
+	$(".delSel").click(function(){
+		$(this).remove();
+	});
+
+	//初始化名称--------------------------------------------------------------------
+	$("#btnName").click(function() {
+		addItems(this,"names","nameTemplate","nameInput");
+	});
+
+	//初始化项目--------------------------------------------------------------------
+	$("#btnTitle").click(function() {
+		addItems(this,"titles","titleTemplate","titleInput");
+	});
+
+	//确认添加项目
+	function addItems(ele,id,template,inputClass) {
+		if($(".na").length!=0){
+			return;
+		}
+		var titlesSpan = $("#"+id);
+		console.log(titlesSpan);
+		var _titleSpan = $("<span class='na' style='display:inline-block;margin-left:10px;'></span>");
+		var inputText = "<input type='text' style='width:80px;' class='"+inputClass+"' data-options='buttonText:\"确定\"'></input>";
+		_titleSpan.append(inputText);
+		titlesSpan.append(_titleSpan);
+		$("."+inputClass).textbox().textbox({
+			buttonText:'确定',
+			onClickButton:function(){
+				var content = $(this).textbox('getValue');
+				appendItem(content,this,id,template);
+			}
+		});
+	}
+
+	//去除数组重复内容
+	function distinctArray(array){
+		var temp = [];
+		for(var i in array){
+			var flag = true;
+			for(var j in temp){
+				if(temp[j] == array[i]){
+					flag = false;
+					break;
+				}
+			}
+			if(flag){
+				temp.push(array[i]);
+			}
+		}
+		return temp;
+	}
+
+	//提取jquery对象中的text
+	function getJqueryText(jqu){
+		var temp = [];
+		for(var i=0; i<jqu.length;i++){
+			temp.push($.trim($(jqu[i]).text()));
+		}
+		return temp;
+	}
+
+	//确认项目
+	$("#confirmItem").click(function(event) {
+		if($(".na").length!=0){
+			alert("请确认人员和项目");
+			return;
+		}
+		var names = $("#names").find(".init_name");
+		var titles = $("#titles").find(".init_title");
+		var nameArray = getJqueryText(names);
+		var titleArray = getJqueryText(titles);
+		personNames = distinctArray(nameArray);
+		payTitles = distinctArray(titleArray);
+		$("#calc").show();
+		//解除点击事件绑定
+		$("#btnName").unbind('click');
+		$("#btnTitle").unbind('click');
+		$("#confirmItem").unbind('click');
+		$(".delSel").unbind('click');
+		//初始化
+		initTitleJson();
+		initPersons();
+		initWeightTemplates();
+	});
+	//刷新网页
+	$("#reloadButton").click(function(event) {
+		location = location;
+	});
+
+	function appendItem(content,ele,id,template){
+		$(ele).parent().remove();
+		var tempA = $("."+template).eq(0).find("a").eq(0).clone();
+		tempA.html(content);
+		tempA.linkbutton();
+		$("#"+id).append(tempA);
+		$(".delSel").click(function(){
+			$(this).remove();
+		});
+	}
+
+	function initTitleJson(){
+		titleJson=[];
+		for(var i in payTitles){
+			// console.log(i);
+			var temp = {text:payTitles[i],title:payTitles[i]}
+			titleJson.push(temp);
+		}
 	}
 
 	//计算数据
