@@ -139,9 +139,9 @@
 </head>
 
 <body>
-    <h1>2008费用计算器</h1>
+    <h1>2008合租费用计算器</h1>
 
-    <h3>填写人员和数据</h3>
+    <h3>填写人员和项目</h3>
     <span class="nameTemplate" style="display: none;">
 		<a class="easyui-linkbutton init_name delSel" data-options="iconCls:'icon-clear',iconAlign:'right'"></a>
     </span>
@@ -153,7 +153,7 @@
 		<span id="names">
 			
 		</span>
-		<a id="btnName" class="easyui-linkbutton" data-options="iconCls:'icon-add'" style="margin-left: 10px">添加</a>  
+		<a id="btnName" class="easyui-linkbutton" data-options="iconCls:'icon-add'" style="margin-left: 11px">添加</a>  
 		 
     </div>
     <div>
@@ -168,7 +168,7 @@
     <h3>填写费用</h3>
     <span class="weightTemplate" style="display: none;font-size: 10px">
 		<span class="weightName"></span>
-    	<input class="weightValue num" style="width: 40px;font-size: 8px" name="weightValue" value="1" />
+    	<input class="weightValue num" style="width: 30px;font-size: 8px" name="weightValue" value="1" />
     </span>
     <span class="weightTemplates"></span>
     <div>
@@ -492,7 +492,8 @@
 		        {field:'paidPrice',title:'已支付',width:100,align:'right',formatter: formatPrice},
 		        {field:'unpaidPrice',title:'未支付',width:100,align:'right',formatter: formatPrice},
 		        {field:'detail',title:'详情',formatter: formatDetail},
-		    ]]    
+		    ]],
+		    singleSelect:true,
 	    });
 	    $("#total").text(totalPayment.totalPrice);
 	    //汇总花费
@@ -519,9 +520,11 @@
 	        columns:[[
 	        	{field:'title',title:'项目',width:100},    
 		        {field:'price',title:'花费',width:100,align:'right',formatter: formatPrice}, 
-		    ]]    
+		    ]],
+		    singleSelect:true,
 	    });
 
+	    
 	});
 
 	function formatPrice(val, row) {
