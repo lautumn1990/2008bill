@@ -17,19 +17,19 @@
 
     </style>
     <script type="text/javascript">
-	    // //原始js拓展extends
-	    // Array.prototype.indexOf = function(val) {
-	    // 	for (var i = 0; i < this.length; i++) {
-	    // 		if (this[i] == val) return i;
-	    // 	}
-	    // 	return -1;
-	    // };
-	    // Array.prototype.remove = function(val) {
-	    // 	var index = this.indexOf(val);
-	    // 		if (index > -1) {
-	    // 	this.splice(index, 1);
-	    // 	}
-	    // };
+	    function getNowFormatDate() {
+	        var date = new Date();
+	        var month = date.getMonth() + 1;
+	        var strDate = date.getDate();
+	        if (month >= 1 && month <= 9) {
+	            month = "0" + month;
+	        }
+	        if (strDate >= 0 && strDate <= 9) {
+	            strDate = "0" + strDate;
+	        }
+	        var currentdate = date.getFullYear() + "年" + month + "月" + strDate+"日";
+	        return currentdate;
+	    } 
     </script>
     <script type="text/javascript">
 	    //定义对象
@@ -139,7 +139,7 @@
 </head>
 
 <body>
-    <h1>2008合租费用计算器</h1>
+    <h1>2008合租费用计算器&nbsp;&nbsp;&nbsp;<span id="now" style="font-size: 20px;"></span></h1>
 
     <h3>填写人员和项目</h3>
     <span class="nameTemplate" style="display: none;">
@@ -199,6 +199,7 @@
     <table id="total_result_dg"></table>
 </body>
 <script type="text/javascript">
+
 	//预加载函数
 	$(function() {
 		// initNames();
@@ -206,6 +207,7 @@
 	    // initPersons();
 	    // initWeightTemplates();
 	});
+	$("#now").html(getNowFormatDate());
 
 
 	//初始化姓名和标题
@@ -248,8 +250,11 @@
 	            valueField:'text',    
 	            textField:'title',
 	            panelHeight:'auto',
-	            value:titleJson[0].title
-	        })
+	            value:titleJson[0].title,
+	        }).combobox('textbox').bind('focus',function(){  
+                $(this).parent().prev().combobox('showPanel');  
+            });
+	        
 	    });
 	    temple.find(".delParam").click(function() {
 	        $(this).parent().remove();
