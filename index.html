@@ -251,8 +251,9 @@
 	            data: titleJson,
 	            valueField:'text',    
 	            textField:'title',
-	            panelHeight:'auto'    
-	        });
+	            panelHeight:'auto',
+	            value:titleJson[0].title
+	        })
 	    });
 	    temple.find(".delParam").click(function() {
 	        $(this).parent().remove();
