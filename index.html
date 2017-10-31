@@ -241,9 +241,12 @@
 	        });
 	        li.find(".isAverage").click(addWeightTemplates(li));
 	        li.appendTo($(this).parentsUntil("ul").parent());
-	        $(this).parentsUntil("ul").parent().find('.num').numberbox({
+	        $(li).find('.num').numberbox({
 	            min: 0,
 	            precision: 2
+	        });
+	        $(".num").next().click(function(event) {
+	        	$(this).find("input").eq(0).select();
 	        });
 	        $(li).find('.title_cc').combobox({    
 	            data: titleJson,
@@ -282,6 +285,9 @@
 	        $(this).parent().find(".num").numberbox({
 	            min: 0,
 	            precision: 1
+	        });
+	        $(".num").next().click(function(event) {
+	        	$(this).find("input").eq(0).select();
 	        });
 	    });
 	}
