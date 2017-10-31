@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>2008费用计算器</title>
+    <title>2008合租费用计算器</title>
     <link rel="stylesheet" type="text/css" href="js/themes/default/easyui.css">
     <link rel="stylesheet" type="text/css" href="js/themes/icon.css">
     <script type="text/javascript" src="js/jquery.min.js"></script>
@@ -150,17 +150,13 @@
     </span>
     <div>
 		<h4 style="display: inline-block;width: 50px;margin-left: 50px;">人员:</h4>
-		<span id="names">
-			
-		</span>
+		<span id="names"></span>
 		<a id="btnName" class="easyui-linkbutton" data-options="iconCls:'icon-add'" style="margin-left: 11px">添加</a>  
 		 
     </div>
     <div>
 		<h4 style="display: inline-block;width: 50px;margin-left: 50px;">项目:</h4>
-		<span id="titles">
-			
-		</span>
+		<span id="titles"></span>
 		<a id="btnTitle" class="easyui-linkbutton" data-options="iconCls:'icon-add'" style="margin-left: 10px">添加</a>  
     </div>
 	<a id="confirmItem" class="easyui-linkbutton" data-options="iconCls:'icon-lock'" style="margin-left: 10px">确认</a> 
@@ -168,7 +164,7 @@
     <h3>填写费用</h3>
     <span class="weightTemplate" style="display: none;font-size: 10px">
 		<span class="weightName"></span>
-    	<input class="weightValue num" style="width: 30px;font-size: 8px" name="weightValue" value="1" type="number" />
+    	<input class="weightValue num" style="width: 50px;font-size: 8px" name="weightValue" value="1" type="number" />
     </span>
     <span class="weightTemplates"></span>
     <div>
@@ -247,7 +243,7 @@
 	            min: 0,
 	            precision: 2
 	        });
-	        $(this).parentsUntil("ul").parent().find('.title_cc').combobox({    
+	        $(li).find('.title_cc').combobox({    
 	            data: titleJson,
 	            valueField:'text',    
 	            textField:'title',
@@ -363,7 +359,7 @@
 	//确认项目
 	$("#confirmItem").click(function(event) {
 		if($(".na").length!=0){
-			alert("请确认人员和项目");
+			alert("请确认人员和项目,以便正确初始化");
 			return;
 		}
 		var names = $("#names").find(".init_name");
@@ -373,16 +369,19 @@
 		personNames = distinctArray(nameArray);
 		payTitles = distinctArray(titleArray);
 		$("#calc").show();
-		//解除点击事件绑定
-		$("#btnName").unbind('click');
-		$("#btnTitle").unbind('click');
-		$("#confirmItem").unbind('click');
+		//隐藏按钮
+		$("#btnName").hide();
+		$("#btnTitle").hide();
+		$("#confirmItem").hide();
+		$(".delSel").linkbutton({iconCls:null});
+		
 		$(".delSel").unbind('click');
 		//初始化
 		initTitleJson();
 		initPersons();
 		initWeightTemplates();
 	});
+
 	//刷新网页
 	$("#reloadButton").click(function(event) {
 		location = location;
