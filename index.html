@@ -209,19 +209,13 @@
 
 </body>
 <script type="text/javascript">
-	function formatPrice(val,row){
-		return val.toFixed(2);
-	}
-	function formatDetail(val,row,index){
-		var person = row;
-		var detail = "";
-		for(var i=0;i<person.needPayments.length;i++){
-			if(i!=0) detail +=",";
-			detail += " "+person.needPayments[i].title;
-			detail += " :"+person.needPayments[i].needPayPrice.toFixed(2);
-		}
-		return "<span title='" + detail + "'>" + detail + "</span>";;
-	}
+	
+	//预加载函数
+	$(function () {
+	 	initPersons();
+	 	initWeightTemplates();
+	});
+
 	function initWeightTemplates(){
 		var weightTemplate = $(".weightTemplate").eq(0).clone();
 		for(var i=0;i<personNames.length;i++){
@@ -266,15 +260,6 @@
 			initPerson(personNames[i]);
 		}
 	}
-
-	$(function () {
-	 	initPersons();
-	 	initWeightTemplates();
-	 	//绑定
-	 	$(".price").bind('blur',function(event) {
-	 		alert("必须为数字");
-	 	});
-	});
 	
 	function addWeightTemplates(temple){
 		temple.find(".isAverage").click(function() {
@@ -295,6 +280,8 @@
 	$("#calc").click(function() {
 		//清空数据
 		persons=[];
+		
+		//1、初始化数据
 		//初始化人
 		$(".param").each(function(index,element){
 			var name = $(element).find(".personName").text();
@@ -340,7 +327,7 @@
 			})
 		});
 
-		//汇总账单
+		//2、获取总账单 //计算每个人已经支付的
 		totalPayment = new TotalPayment();
 		for(var i = 0;i<persons.length;i++){
 			var person = persons[i];
@@ -377,9 +364,27 @@
 		}); 
 		
 	});
-
+	
+	function formatPrice(val,row){				
+		var price = val.toFixed(2);		
+		if(price>=0)
+			return price;		
+		else
+			return "<span style='color:red;'>"+price+"</span>";			
+	}
+	function formatDetail(val,row,index){
+		var person = row;
+		var detail = "";
+		for(var i=0;i<person.needPayments.length;i++){
+			if(i!=0) detail +=",";
+			detail += " "+person.needPayments[i].title;
+			detail += " :"+person.needPayments[i].needPayPrice.toFixed(2);
+		}
+		return "<span title='" + detail + "'>" + detail + "</span>";;
+	}
 	
 
 </script>
+	<!-- gh-pages -->
 
 </html>
