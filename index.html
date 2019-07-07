@@ -135,7 +135,8 @@
 	    var persons = [];
 	    var weightTemplates = [];
 	    var personNames = ["张秋", "刘师源", "董清国", "陆俊彪", "高宇豪", "刘璨", "郭彦秋"];
-	    var payTitles = ["饭费","电费","水费","房费","燃气费"];
+	    // var payTitles = ["饭费","电费","水费","房费","燃气费"];
+	    var payTitles = ["电费","水费","房租押金","燃气费","保洁","杂费"];
 	    var titleJson = [];
     </script>
 </head>
@@ -245,7 +246,7 @@
 	        li.find(".isAverage").click(addWeightTemplates(li));
 	        li.appendTo($(this).parentsUntil("ul").parent());
 	        $(li).find('.num').numberbox({
-	            min: 0,
+	            // min: 0,
 	            precision: 2
 	        });
 	        $(".num").next().click(function(event) {
@@ -286,7 +287,7 @@
 	            $(this).parent().find(".weight").append(weightTemplates.find(".weightTemplate").show());
 	        }
 	        $(this).parent().find(".num").numberbox({
-	            min: 0,
+	            // min: 0,
 	            precision: 1
 	        });
 	        $(".num").next().click(function(event) {
